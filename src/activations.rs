@@ -21,40 +21,51 @@ impl Activation {
     }
 }
 
+/// Updates the slice in place with the activation fn output
 fn linear(_: &mut [f32]) {
     
 }
 
+/// Updates the slice in place with the derivation
+fn linear_derivation(x: &mut [f32]) {
+    x.iter_mut().for_each(|n| *n = 1.0);
+}
+
 fn sigmoid(x: &mut [f32]) {
-    for i in 0..x.len() {
-        x[i] = 1.0 / (1.0 + E.powf(-x[i]));
-    }
+    x.iter_mut().for_each(|f| *f = 1.0 / (1.0 + E.powf(-*f)));
+}
+
+fn sigmoid_derivation(x: &mut [f32]) {
+    x.iter_mut().for_each(|f| *f = E.powf(-*f) / (1.0 + E.powf(-*f)).powi(2));
 }
 
 fn tanh(x: &mut [f32]) {
-    for i in 0..x.len() {
-        x[i] = x[i].tanh();
-    }
+    x.iter_mut().for_each(|f| *f = (*f).tanh());
+}
+
+fn tanh_derivation(x: &mut [f32]) {
+    x.iter_mut().for_each(|f| *f = 1.0 - (*f).tanh().powi(2));
 }
 
 fn relu(x: &mut [f32]) {
-    for i in 0..x.len() {
-        if x[i] < 0.0 {
-            x[i] = 0.0;
-        } else {
-            x[i] = x[i];
-        }
-    }
+    x.iter_mut().for_each(|f| *f = if *f > 0.0 { *f } else { 0.0 });
 }
 
+fn relu_derivation(x: &mut [f32]) {
+    x.iter_mut().for_each(|f| *f = if *f > 0.0 { 1.0 } else { 0.0 });
+}
+
+// TODO: Why does this give NAN?? 
+// Cuz of big values...
+// Need to use max normalization...
 fn softmax(x: &mut [f32]) {
     let mut sum = 0.0;
     for i in x.iter() {
-        sum += *i;
+        sum += E.powf(*i);
     }
 
     for i in 0..x.len() {
-        x[i] /= sum;
+        x[i] = E.powf(x[i]) / sum;
     }
 }
 
